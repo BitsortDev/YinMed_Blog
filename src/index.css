@@ -19,6 +19,8 @@ h1 {
   color: blue;
 } 
 
+/* NAVBAR css*/
+
 .navBar {
   padding: 15px 20px;
   display: flex;
@@ -35,7 +37,7 @@ h1 {
   color: blue;
 }
 
-/* LINKS DEFAULT (DESKTOP) */
+
 .links ul {
   display: flex;
   list-style: none;
@@ -55,19 +57,20 @@ h1 {
   border-radius: 6px;
 }
 
-/* ICON ALIGN FIX */
+
 .material-symbols-outlined {
   font-size: 20px;
 }
 
-/* HAMBURGER ICON (hidden on desktop) */
+
 .menuIcon {
   display: none;
   cursor: pointer;
   font-size: 28px;
 }
 
-/* ===== MOBILE ===== */
+/* mobile for Navbar*/
+
 @media screen and (max-width: 768px) {
 
   .menuIcon {

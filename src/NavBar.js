@@ -8,19 +8,19 @@ const NavBar = () => {
   return (
     <div className="navBar">
       
-      {/* BRAND */}
+ 
       <div className="brand">
         <h1>{brand}</h1>
       </div>
 
-      {/* HAMBURGER ICON */}
+    
       <div className="menuIcon" onClick={() => setOpen(!open)}>
         <span className="material-symbols-outlined">
           {open ? "close" : "menu"}
         </span>
       </div>
 
-      {/* LINKS */}
+      
       <div className={`links ${open ? "active" : ""}`}>
         <ul>
           <li>
