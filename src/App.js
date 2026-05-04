@@ -5,6 +5,7 @@ import NavBar from "./NavBar";
 import Welcome from "./Welcome";
 import Login from "./Login";
 import SignUp from "./SignUp";
+import ResetPassword from "./ResetPassword";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route exact path="/" element={<Welcome />}/>
             <Route path="/login" element={<Login />}/>
             <Route path="/signup" element={<SignUp />}/>
+            <Route path="/resetpassword" element={<ResetPassword />}/>
             </Routes>
           </div>
         </div>
@@ -25,7 +27,7 @@ function App() {
       </div>
     </Router>
 
-  );
+  );  
 }
 
 export default App;
