@@ -1,13 +1,21 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "./firebase";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  getDoc
+} from "firebase/firestore";
 
 const SignUp = () => {
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +25,40 @@ const SignUp = () => {
   const [successMsg, setSuccessMsg] = useState("");
 
   const navigate = useNavigate();
+
+  // 🔥 PRO METHOD: direct document lookup (NO QUERY)
+  const checkUsernameExists = async (username) => {
+    const ref = doc(db, "usernames", username.toLowerCase());
+    const snap = await getDoc(ref);
+    return snap.exists();
+  };
+
+  // 🔥 LIVE USERNAME CHECK (DEBOUNCED)
+  useEffect(() => {
+    if (!username) {
+      setUsernameError("");
+      setUsernameAvailable(null);
+      return;
+    }
+
+    const delayCheck = setTimeout(async () => {
+      setCheckingUsername(true);
+
+      const exists = await checkUsernameExists(username);
+
+      if (exists) {
+        setUsernameError("Username already taken");
+        setUsernameAvailable(false);
+      } else {
+        setUsernameError("");
+        setUsernameAvailable(true);
+      }
+
+      setCheckingUsername(false);
+    }, 400);
+
+    return () => clearTimeout(delayCheck);
+  }, [username]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -31,9 +73,15 @@ const SignUp = () => {
       return;
     }
 
+    if (usernameError || usernameAvailable === false) {
+      alert("Please choose a valid username");
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // 1. Create auth user
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email.trim(),
@@ -42,18 +90,23 @@ const SignUp = () => {
 
       const user = userCredential.user;
 
-    
+      // 2. Save user profile
       await setDoc(doc(db, "users", user.uid), {
         fullName,
-        username,
+        username: username.toLowerCase(),
         phone,
         email,
         uid: user.uid,
         createdAt: serverTimestamp()
       });
 
-      setSuccessMsg(` Welcome ${username} to YinMed, account created successfully!`);
+      // 3. 🔥 RESERVE USERNAME (KEY PART OF PRO SYSTEM)
+      await setDoc(doc(db, "usernames", username.toLowerCase()), {
+        uid: user.uid,
+        createdAt: serverTimestamp()
+      });
 
+      setSuccessMsg(`Welcome ${username}, account created successfully!`);
 
       setFullName("");
       setUsername("");
@@ -64,7 +117,6 @@ const SignUp = () => {
 
       setLoading(false);
 
-    
       setTimeout(() => {
         navigate("/login");
       }, 2500);
@@ -78,16 +130,13 @@ const SignUp = () => {
 
   return (
     <div className="AccountContainer">
-
       <div className="AccountLeft">
-
         <h2>Create Account</h2>
 
         <div className="subAccHead">
           Register to get access to Valid Medical Information
         </div>
 
-  
         {successMsg && (
           <div className="successPopup">
             {successMsg}
@@ -112,9 +161,27 @@ const SignUp = () => {
               type="text"
               placeholder="Username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setUsername(e.target.value.toLowerCase())}
             />
           </div>
+
+          {checkingUsername && (
+            <p style={{ fontSize: "13px", color: "gray" }}>
+              Checking username...
+            </p>
+          )}
+
+          {!checkingUsername && usernameAvailable === true && (
+            <p style={{ fontSize: "13px", color: "green" }}>
+              Username is available
+            </p>
+          )}
+
+          {usernameError && (
+            <p style={{ fontSize: "13px", color: "red" }}>
+              {usernameError}
+            </p>
+          )}
 
           <div className="AccountInput">
             <span className="material-symbols-outlined">contact_phone</span>
@@ -160,14 +227,14 @@ const SignUp = () => {
             {loading ? "Creating account..." : "Register"}
           </button>
 
-          <div><Link to="/login">Already Have an Account? login now!</Link> </div>
+          <div>
+            <Link to="/login">
+              Already Have an Account? login now!
+            </Link>
+          </div>
 
         </form>
       </div>
-
-    
-
-      
     </div>
   );
 };
