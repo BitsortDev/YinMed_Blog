@@ -2,12 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "./firebase";
-import {
-  doc,
-  setDoc,
-  serverTimestamp,
-  getDoc
-} from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 
 const SignUp = () => {
   const [fullName, setFullName] = useState("");
@@ -26,14 +21,14 @@ const SignUp = () => {
 
   const navigate = useNavigate();
 
-  // 🔥 PRO METHOD: direct document lookup (NO QUERY)
+  
   const checkUsernameExists = async (username) => {
     const ref = doc(db, "usernames", username.toLowerCase());
     const snap = await getDoc(ref);
     return snap.exists();
   };
 
-  // 🔥 LIVE USERNAME CHECK (DEBOUNCED)
+
   useEffect(() => {
     if (!username) {
       setUsernameError("");
@@ -81,7 +76,6 @@ const SignUp = () => {
     setLoading(true);
 
     try {
-      // 1. Create auth user
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email.trim(),
@@ -90,7 +84,7 @@ const SignUp = () => {
 
       const user = userCredential.user;
 
-      // 2. Save user profile
+      
       await setDoc(doc(db, "users", user.uid), {
         fullName,
         username: username.toLowerCase(),
@@ -100,7 +94,7 @@ const SignUp = () => {
         createdAt: serverTimestamp()
       });
 
-      // 3. 🔥 RESERVE USERNAME (KEY PART OF PRO SYSTEM)
+      
       await setDoc(doc(db, "usernames", username.toLowerCase()), {
         uid: user.uid,
         createdAt: serverTimestamp()
