@@ -3,6 +3,7 @@ import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "./firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const [fullName, setFullName] = useState("");
@@ -14,6 +15,8 @@ const SignUp = () => {
 
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -51,6 +54,7 @@ const SignUp = () => {
 
       setSuccessMsg(` Welcome ${username} to YinMed, account created successfully!`);
 
+
       setFullName("");
       setUsername("");
       setPhone("");
@@ -62,7 +66,7 @@ const SignUp = () => {
 
     
       setTimeout(() => {
-        window.location.reload();
+        navigate("/login");
       }, 2500);
 
     } catch (error) {
