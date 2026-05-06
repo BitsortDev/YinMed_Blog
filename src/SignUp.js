@@ -97,6 +97,9 @@ const SignUp = () => {
       
       await setDoc(doc(db, "usernames", username.toLowerCase()), {
         uid: user.uid,
+        email: email.trim(),
+        phoneNumber: phone.trim(),
+        fullName: fullName.trim(),
         createdAt: serverTimestamp()
       });
 

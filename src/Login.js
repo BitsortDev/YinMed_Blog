@@ -32,54 +32,84 @@ const Login = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please fill in all fields");
-      return;
-    }
+const handleLogin = async (e) => {
+  e.preventDefault();
 
-    setLoading(true);
+  if (!email || !password) {
+    alert("Please fill in all fields");
+    return;
+  }
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email.trim(),
-        password
-      );
+  setLoading(true);
 
-      const user = userCredential.user;
-
-      console.log("User logged in:", user);
+  try {
+    let loginEmail = email.trim();
 
 
+    if (!loginEmail.includes("@")) {
+      const ref = doc(db, "usernames", loginEmail.toLowerCase());
+      const snap = await getDoc(ref);
 
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-
-      let username = "";
-
-      if (userSnap.exists()) {
-        username = userSnap.data().username;
+      if (!snap.exists()) {
+        throw new Error("Username not found");
       }
 
+      const data = snap.data();
 
-      setWelcomeMessage(`Welcome, ${username}!`);
+      if (!data.email) {
+        throw new Error("User email not found in database");
+      }
 
-      setLoading(false); 
-
-
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 2000);
-
-    } catch (error) {
-      console.error(error.message);
-      alert(error.message);
-      setLoading(false);
+      loginEmail = data.email;
     }
-  };
+
+    if (!loginEmail || loginEmail.length < 5) {
+      throw new Error("Invalid login email");
+    }
+
+    if (!password || password.length < 6) {
+      throw new Error("Password must be at least 6 characters");
+    }
+
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      loginEmail,
+      password
+    );
+
+    const user = userCredential.user;
+
+    const profileRef = doc(db, "users", user.uid);
+    const profileSnap = await getDoc(profileRef);
+
+    let username = "";
+
+    if (profileSnap.exists()) {
+      username = profileSnap.data().username;
+    }
+
+    setWelcomeMessage(`Welcome, ${username}!`);
+
+    setLoading(false);
+
+    setTimeout(() => {
+      window.location.href = "/dashboard";
+    }, 2000);
+
+  } catch (error) {
+  console.error(error.code);
+  if (error.code === "auth/invalid-credential") {
+    alert("Invalid email or password");
+  } 
+    else {
+      alert("Login failed: " + error.message);
+    }
+
+
+  setLoading(false);
+}
+};
 
   return (
     <div className="LoginContainer">
@@ -113,7 +143,7 @@ const Login = () => {
               <input
                 type="text"
                 required
-                placeholder="Email address"
+                placeholder="Email address\Username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
