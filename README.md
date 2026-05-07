@@ -1,70 +1,123 @@
-# Getting Started with Create React App
+# 🧠 YinMed Blog
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+YinMed Blog is a medical learning and career platform designed to connect students, medical professionals, and recruiters in one ecosystem. It provides a structured space for medical knowledge sharing, mentorship, and recruitment opportunities.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Live Demo
 
-### `npm start`
+https://yin-med-blog.vercel.app/
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Project Vision
 
-### `npm test`
+The goal of YinMed Blog is to solve three major problems:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- People can learn and get access to verified medical information
+- Lack of structured medical learning platforms for students
+- Lack of mentorship for health care student
+- Limited platforms for medical experts to share verified knowledge
+- Difficulty for recruiters to find and verify qualified medical professionals
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Features
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Authentication System
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- User signup and login with Firebase Authentication
+- Secure password handling
+- Username uniqueness validation
+- Real-time form validation (phone, username, password)
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### User Roles System
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Student
+- Medical Expert
+- Recruiter
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Each role has different access permissions and dashboard experience.
+Each role undergo different verification before earning a badge, the
+available are User, Student, Expert, Recruiter.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+### Blog System (Core Feature)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- Experts can create medical articles
+- Users can read published content
+- Articles organized by categories (Biochemistry, Pharmacology, etc.)
+- Individual post detail pages
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+### Expert System
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Expert profiles with specialization
+- Bio and professional details
+- Verified status (future enhancement)
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Recruiter System
 
-### Making a Progressive Web App
+- Recruiters can discover experts
+- Post job opportunities
+- Verify professional profiles (future enhancement)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+### Search & Filter
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- Search blog posts by title
+- Filter content by category
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### UX Features
 
-### `npm run build` fails to minify
+- Real-time username validation
+- Phone number validation (11 digits)
+- Disabled submit button until form is valid
+- Loading states during authentication
+- Error handling and feedback messages
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+## Tech Stack
+
+- React.js
+- Firebase Authentication
+- Firestore Database
+- Firebase Storage (future use)
+- React Router
+- CSS3
+
+---
+
+## Key Highlights
+
+- Role-based system architecture
+- Real-time validation logic
+- Secure authentication flow
+- Scalable Firestore database design
+- Clean and responsive UI
+- Production-level frontend structure
+
+---
+
+## Project Structure
+
+/src
+/components
+Navbar
+/pages
+Home
+Login
+Signup
+Dashboard
+/services
+firebase.js
