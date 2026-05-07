@@ -23,18 +23,24 @@ const SignUp = () => {
 
   const navigate = useNavigate();
 
+  // Check if username exists
   const checkUsernameExists = async (username) => {
     const ref = doc(db, "usernames", username.toLowerCase());
     const snap = await getDoc(ref);
     return snap.exists();
   };
 
+  // Live username checker
   useEffect(() => {
     if (!username) {
       setUsernameError("");
       setUsernameAvailable(null);
       return;
     }
+
+    // Clear old messages immediately user types again
+    setUsernameError("");
+    setUsernameAvailable(null);
 
     const delayCheck = setTimeout(async () => {
       setCheckingUsername(true);
@@ -44,17 +50,30 @@ const SignUp = () => {
       if (exists) {
         setUsernameError("Username already taken");
         setUsernameAvailable(false);
+
+        // Remove error after 2 seconds
+        setTimeout(() => {
+          setUsernameError("");
+        }, 2000);
+
       } else {
-        setUsernameError("");
         setUsernameAvailable(true);
+
+        // Remove success message after 2 seconds
+        setTimeout(() => {
+          setUsernameAvailable(null);
+        }, 2000);
       }
 
       setCheckingUsername(false);
-    }, 400);
+
+    }, 500);
 
     return () => clearTimeout(delayCheck);
+
   }, [username]);
 
+  // Signup function
   const handleSignup = async (e) => {
     e.preventDefault();
 
@@ -96,6 +115,7 @@ const SignUp = () => {
 
       const user = userCredential.user;
 
+      // Save user data
       await setDoc(doc(db, "users", user.uid), {
         fullName,
         username: username.toLowerCase(),
@@ -105,6 +125,7 @@ const SignUp = () => {
         createdAt: serverTimestamp(),
       });
 
+      // Save username collection
       await setDoc(doc(db, "usernames", username.toLowerCase()), {
         uid: user.uid,
         email: email.trim(),
@@ -113,8 +134,11 @@ const SignUp = () => {
         createdAt: serverTimestamp(),
       });
 
-      setSuccessMsg(`Welcome ${username}, account created successfully!`);
+      setSuccessMsg(
+        `Welcome ${username}, account created successfully!`
+      );
 
+      // Clear form
       setFullName("");
       setUsername("");
       setPhone("");
@@ -124,9 +148,11 @@ const SignUp = () => {
 
       setLoading(false);
 
+      // Redirect
       setTimeout(() => {
         navigate("/login");
       }, 2500);
+
     } catch (error) {
       console.error(error.message);
 
@@ -140,9 +166,22 @@ const SignUp = () => {
     }
   };
 
+
+  const isFormValid =
+  fullName &&
+  username &&
+  phone.length === 11 &&
+  email &&
+  password &&
+  confirmPassword &&
+  !usernameError &&
+  usernameAvailable !== false &&
+  !phoneError;
+
   return (
     <div className="AccountContainer">
       <div className="AccountLeft">
+
         <h2>Create Account</h2>
 
         <div className="subAccHead">
@@ -155,50 +194,81 @@ const SignUp = () => {
           </div>
         )}
 
-        <form onSubmit={handleSignup} className="AccountForm">
+        <form
+          onSubmit={handleSignup}
+          className="AccountForm"
+        >
 
+         
           <div className="AccountInput">
-            <span className="material-symbols-outlined">id_card</span>
+            <span className="material-symbols-outlined">
+              id_card
+            </span>
 
             <input
               type="text"
               placeholder="Full name"
               value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              onChange={(e) =>
+                setFullName(e.target.value)
+              }
             />
           </div>
 
+         
           <div className="AccountInput">
-            <span className="material-symbols-outlined">person</span>
+            <span className="material-symbols-outlined">
+              person
+            </span>
 
             <input
               type="text"
               placeholder="Username"
               value={username}
               onChange={(e) =>
-                setUsername(e.target.value.toLowerCase())
+                setUsername(
+                  e.target.value.toLowerCase()
+                )
               }
             />
           </div>
 
+          
           {checkingUsername && (
-            <p style={{ fontSize: "13px", color: "gray" }}>
+            <p
+              style={{
+                fontSize: "13px",
+                color: "gray",
+              }}
+            >
               Checking username...
             </p>
           )}
 
-          {!checkingUsername && usernameAvailable === true && (
-            <p style={{ fontSize: "13px", color: "green" }}>
-              Username is available
-            </p>
-          )}
+          {!checkingUsername &&
+            usernameAvailable === true && (
+              <p
+                style={{
+                  fontSize: "13px",
+                  color: "green",
+                }}
+              >
+                Username is available
+              </p>
+            )}
 
           {usernameError && (
-            <p style={{ fontSize: "13px", color: "red" }}>
+            <p
+              style={{
+                fontSize: "13px",
+                color: "red",
+              }}
+            >
               {usernameError}
             </p>
           )}
 
+         
           <div className="AccountInput">
             <span className="material-symbols-outlined">
               contact_phone
@@ -212,69 +282,111 @@ const SignUp = () => {
                 const value = e.target.value;
 
                
-                const onlyNumbers = value.replace(/\D/g, "");
+                const onlyNumbers =
+                  value.replace(/\D/g, "");
 
-              
-                setPhone(onlyNumbers.slice(0, 11));
+                
+                setPhone(
+                  onlyNumbers.slice(0, 11)
+                );
 
                 
                 if (/[^0-9]/.test(value)) {
-                  setPhoneError("Only numbers are allowed");
-                } else if (onlyNumbers.length < 11) {
-                  setPhoneError("Phone number must be 11 digits");
+                  setPhoneError(
+                    "Only numbers are allowed"
+                  );
+
+                } else if (
+                  onlyNumbers.length < 11
+                ) {
+                  setPhoneError(
+                    "Phone number must be 11 digits"
+                  );
+
                 } else {
                   setPhoneError("");
                 }
               }}
-              className={phoneError ? "inputError" : ""}
+              className={
+                phoneError ? "inputError" : ""
+              }
             />
           </div>
 
+          
           {phoneError && (
-            <p style={{ fontSize: "13px", color: "red" }}>
+            <p
+              style={{
+                fontSize: "13px",
+                color: "red",
+              }}
+            >
               {phoneError}
             </p>
           )}
 
+        
           <div className="AccountInput">
-            <span className="material-symbols-outlined">mail</span>
+            <span className="material-symbols-outlined">
+              mail
+            </span>
 
             <input
               type="email"
               placeholder="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
             />
           </div>
 
+          
           <div className="AccountInput">
-            <span className="material-symbols-outlined">lock</span>
+            <span className="material-symbols-outlined">
+              lock
+            </span>
 
             <input
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
             />
           </div>
 
+         
           <div className="AccountInput">
-            <span className="material-symbols-outlined">lock</span>
+            <span className="material-symbols-outlined">
+              lock
+            </span>
 
             <input
               type="password"
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(e) =>
-                setConfirmPassword(e.target.value)
+                setConfirmPassword(
+                  e.target.value
+                )
               }
             />
           </div>
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Creating account..." : "Register"}
-          </button>
+         
+          <button
+             type="submit"
+             disabled={loading || !isFormValid}
+                  style={{
+                  opacity: loading || !isFormValid ? 0.5 : 1,
+                  cursor: loading || !isFormValid ? "not-allowed" : "pointer",
+                        }}>
+                       {loading ? "Creating account..." : "Register"}
+            </button>
 
+         
           <div>
             <Link to="/login">
               Already Have an Account? login now!
