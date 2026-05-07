@@ -12,6 +12,8 @@ const SignUp = () => {
   const [checkingUsername, setCheckingUsername] = useState(false);
 
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,13 +23,11 @@ const SignUp = () => {
 
   const navigate = useNavigate();
 
-  
   const checkUsernameExists = async (username) => {
     const ref = doc(db, "usernames", username.toLowerCase());
     const snap = await getDoc(ref);
     return snap.exists();
   };
-
 
   useEffect(() => {
     if (!username) {
@@ -58,8 +58,20 @@ const SignUp = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    if (!fullName || !username || !email || !password || !confirmPassword) {
+    if (
+      !fullName ||
+      !username ||
+      !phone ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
       alert("Please fill all required fields");
+      return;
+    }
+
+    if (phone.length !== 11) {
+      alert("Phone number must be 11 digits");
       return;
     }
 
@@ -84,23 +96,21 @@ const SignUp = () => {
 
       const user = userCredential.user;
 
-      
       await setDoc(doc(db, "users", user.uid), {
         fullName,
         username: username.toLowerCase(),
         phone,
         email,
         uid: user.uid,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
-      
       await setDoc(doc(db, "usernames", username.toLowerCase()), {
         uid: user.uid,
         email: email.trim(),
         phoneNumber: phone.trim(),
         fullName: fullName.trim(),
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
       setSuccessMsg(`Welcome ${username}, account created successfully!`);
@@ -117,14 +127,15 @@ const SignUp = () => {
       setTimeout(() => {
         navigate("/login");
       }, 2500);
-
     } catch (error) {
       console.error(error.message);
+
       if (error.code === "auth/email-already-in-use") {
         alert("Email is already in use by another user");
       } else {
         alert(error.message);
       }
+
       setLoading(false);
     }
   };
@@ -148,6 +159,7 @@ const SignUp = () => {
 
           <div className="AccountInput">
             <span className="material-symbols-outlined">id_card</span>
+
             <input
               type="text"
               placeholder="Full name"
@@ -158,11 +170,14 @@ const SignUp = () => {
 
           <div className="AccountInput">
             <span className="material-symbols-outlined">person</span>
+
             <input
               type="text"
               placeholder="Username"
               value={username}
-              onChange={(e) => setUsername(e.target.value.toLowerCase())}
+              onChange={(e) =>
+                setUsername(e.target.value.toLowerCase())
+              }
             />
           </div>
 
@@ -185,17 +200,45 @@ const SignUp = () => {
           )}
 
           <div className="AccountInput">
-            <span className="material-symbols-outlined">contact_phone</span>
+            <span className="material-symbols-outlined">
+              contact_phone
+            </span>
+
             <input
-              type="tel"
+              type="text"
               placeholder="Phone Number"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+
+                // Remove non numbers
+                const onlyNumbers = value.replace(/\D/g, "");
+
+                // Save only numbers and limit to 11
+                setPhone(onlyNumbers.slice(0, 11));
+
+                // Validation
+                if (/[^0-9]/.test(value)) {
+                  setPhoneError("Only numbers are allowed");
+                } else if (onlyNumbers.length < 11) {
+                  setPhoneError("Phone number must be 11 digits");
+                } else {
+                  setPhoneError("");
+                }
+              }}
+              className={phoneError ? "inputError" : ""}
             />
           </div>
 
+          {phoneError && (
+            <p style={{ fontSize: "13px", color: "red" }}>
+              {phoneError}
+            </p>
+          )}
+
           <div className="AccountInput">
             <span className="material-symbols-outlined">mail</span>
+
             <input
               type="email"
               placeholder="Email"
@@ -206,6 +249,7 @@ const SignUp = () => {
 
           <div className="AccountInput">
             <span className="material-symbols-outlined">lock</span>
+
             <input
               type="password"
               placeholder="Password"
@@ -216,11 +260,14 @@ const SignUp = () => {
 
           <div className="AccountInput">
             <span className="material-symbols-outlined">lock</span>
+
             <input
               type="password"
               placeholder="Confirm Password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) =>
+                setConfirmPassword(e.target.value)
+              }
             />
           </div>
 
