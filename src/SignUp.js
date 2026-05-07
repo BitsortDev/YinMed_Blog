@@ -217,7 +217,7 @@ const SignUp = () => {
               
                 setPhone(onlyNumbers.slice(0, 11));
 
-                // Validation
+                
                 if (/[^0-9]/.test(value)) {
                   setPhoneError("Only numbers are allowed");
                 } else if (onlyNumbers.length < 11) {
