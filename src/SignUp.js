@@ -211,10 +211,10 @@ const SignUp = () => {
               onChange={(e) => {
                 const value = e.target.value;
 
-                // Remove non numbers
+               
                 const onlyNumbers = value.replace(/\D/g, "");
 
-                // Save only numbers and limit to 11
+              
                 setPhone(onlyNumbers.slice(0, 11));
 
                 // Validation
