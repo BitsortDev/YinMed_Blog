@@ -120,7 +120,11 @@ const SignUp = () => {
 
     } catch (error) {
       console.error(error.message);
-      alert(error.message);
+      if (error.code === "auth/email-already-in-use") {
+        alert("Email is already in use by another user");
+      } else {
+        alert(error.message);
+      }
       setLoading(false);
     }
   };
