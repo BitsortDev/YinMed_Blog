@@ -45,7 +45,6 @@ const Welcome = () => {
           <Link to="/signup">{owner}</Link> 
         </div>
       </div>
-
     </div>
   );
 };
